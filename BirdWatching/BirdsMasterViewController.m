@@ -10,6 +10,7 @@
 #import "BirdsDetailViewController.h"
 #import "BirdSightingDataController.h"
 #import "BirdSighting.h"
+#import "AddSightingViewController.h"
 
 /*
 @interface BirdsMasterViewController () {
@@ -17,6 +18,9 @@
 }
 @end
 */
+
+@interface BirdsMasterViewController () <AddSightingViewControllerDelegate>
+@end
 
 @implementation BirdsMasterViewController
 
@@ -56,7 +60,22 @@
         BirdsDetailViewController *detailViewController = [segue destinationViewController];
         
         detailViewController.sighting = [self.dataController objectInListAtIndex:[self.tableView indexPathForSelectedRow].row];
+    }else if ([[segue identifier] isEqualToString:@"ShowAddSightingView"]) {
+        AddSightingViewController *addController = (AddSightingViewController *)[[[segue destinationViewController] viewControllers] objectAtIndex:0];
+        addController.delegate = self;
     }
+}
+
+- (void)addSightingViewControllerDidCancel:(AddSightingViewController *)controller {
+    [self dismissViewControllerAnimated:YES completion:NULL];
+}
+
+- (void)addSightingViewControllerDidFinish:(AddSightingViewController *)controller name:(NSString *)name location:(NSString *)location {
+    if ([name length] || [location length]) {
+        [self.dataController addBirdSightingWithName:name location:location];
+        [[self tableView] reloadData];
+    }
+    [self dismissModalViewControllerAnimated:YES];
 }
 
 @end
